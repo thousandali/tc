@@ -1,0 +1,87 @@
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>T.C. Kimlik No</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+    <style>
+        * {
+            text-align: center
+        }
+    </style>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-git.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body>
+    <div class="container" id="content">
+        <div class="row">
+            <div class="col-sm">
+                            <h3>T.C. Kimlik No Oluşturucu</h3>
+                              <button class="form-control"  style="background-color:gray;" id="generateTcNo">T.C. Kimlik No oluştur</button>
+                              <br>
+                <input class="form-control" style="background-color:#8dcaff;" id="tcNo" type="text" autocomplete="off" placeholder="Bir T.C. Kimlik No oluşturmak için butona tıkla"DISABLED />
+              
+                </br>
+                <h3>T.C. Kimlik No Doğrulayıcı</h3>
+                <input id="tc" type="tel" class="input-lg form-control" autocomplete="off" placeholder="12345678901">
+                <h4 class="text-uppercase text-danger"></h4>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function generateTcNo() {
+            var value = (Math.floor(Math.random() * 1000000000) + 100000000).toString(),
+                list = value.split("").map(function(t) {
+                    return parseInt(t, 10)
+                }),
+                tek = list[0] + list[2] + list[4] + list[6] + list[8],
+                cift = list[1] + list[3] + list[5] + list[7],
+                tc10 = (7 * tek - cift) % 10;
+            var uuid = value + tc10.toString() + (cift + tek + tc10).toString() % 10;
+            return uuid;
+        }
+        $('#generateTcNo').on('click', function() {
+            $('#tcNo').val(generateTcNo());
+        });
+    </script>
+    <script>
+        $("document").ready(function() {
+            function checkTcNum(value) {
+                value = value.toString();
+                var isEleven = /^[0-9]{11}$/.test(value);
+                var totalX = 0;
+                for (var i = 0; i < 10; i++) {
+                    totalX += Number(value.substr(i, 1));
+                }
+                var isRuleX = totalX % 10 == value.substr(10, 1);
+                var totalY1 = 0;
+                var totalY2 = 0;
+                for (var i = 0; i < 10; i += 2) {
+                    totalY1 += Number(value.substr(i, 1));
+                }
+                for (var i = 1; i < 10; i += 2) {
+                    totalY2 += Number(value.substr(i, 1));
+                }
+                var isRuleY = ((totalY1 * 7) - totalY2) % 10 == value.substr(9, 0);
+                return isEleven && isRuleX && isRuleY;
+            };
+            $('#tc').on('keyup focus blur load', function(event) {
+                event.preventDefault();
+                var isValid = checkTcNum($(this).val());
+                console.log('isValid ', isValid);
+                if (isValid) {
+                    $('h4').text("DOĞRU").attr('class', 'text-uppercase text-success');
+                } else {
+                    $('h4').text("YANLIŞ").attr('class', 'text-uppercase text-danger');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
